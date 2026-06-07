@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizz : Wi, Mwa Fooyet — Cuisine traditionnelle — Nêlêmwa</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6eb;
+    --card: #fffdf7;
+    --border: #dfc9a0;
+    --text: #2a1800;
+    --muted: #8a6a40;
+    --accent: #c8913a;
+    --green: #3d7a5a;
+    --red: #9a3a5a;
+    --blue: #3a5fa0;
+    --purple: #6a4a9a;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: linear-gradient(150deg, #fef9f2 0%, #f5e9d3 60%, #e8d8bb 100%);
+    min-height: 100vh;
+    font-family: 'Source Sans 3', sans-serif;
+    color: var(--text);
+    padding: 28px 16px 60px;
+  }
+  .container { max-width: 620px; margin: 0 auto; }
+
+  /* HEADER */
+  .site-header { margin-bottom: 24px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .brand-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); }
+  .brand-sub { font-family: 'Playfair Display', serif; font-style: italic; font-size: 13px; color: var(--muted); }
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .progress-track { flex: 1; height: 6px; background: #ddd0bc; border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s ease; }
+  .progress-label { font-size: 12px; color: var(--muted); min-width: 38px; text-align: right; }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 26px 24px;
+    box-shadow: 0 4px 28px rgba(80,40,0,.09);
+    margin-bottom: 18px;
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  .type-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 3px 11px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+    font-family: 'Source Sans 3', sans-serif;
+  }
+  .tag-kanak  { background: #b07a28; }
+  .tag-fr     { background: var(--green); }
+  .tag-qcm    { background: var(--blue); }
+  .tag-vf     { background: var(--red); }
+  .tag-phrase { background: var(--purple); }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+
+  /* TEXT INPUT */
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--text);
+    background: #fdf6ec;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    resize: vertical;
+    outline: none;
+    transition: border-color .2s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea.correct { border-color: var(--green); background: #edf7f1; }
+  textarea.wrong   { border-color: var(--red);   background: #fcedf2; }
+
+  /* QCM */
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .choice-btn {
+    padding: 13px 10px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    line-height: 1.35;
+    background: #fdf6ec;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--text);
+    transition: all .15s;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: #fef3e0; }
+  .choice-btn.selected  { background: #e8f0fb; border-color: var(--blue); color: #1a2a5a; }
+  .choice-btn.c-correct { background: #edf7f1; border-color: var(--green); color: #1a3a2a; }
+  .choice-btn.c-wrong   { background: #fcedf2; border-color: var(--red);   color: #3a0a1a; }
+  .choice-btn:disabled  { cursor: default; }
+
+  /* VRAI/FAUX */
+  .vf-row { display: flex; gap: 14px; }
+  .vf-btn {
+    flex: 1;
+    padding: 15px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    background: #fdf6ec;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all .15s;
+  }
+  .vf-btn:hover:not(:disabled) { border-color: var(--accent); background: #fef3e0; }
+  .vf-btn.selected  { background: #e8f0fb; border-color: var(--blue); color: #1a2a5a; }
+  .vf-btn.c-correct { background: #edf7f1; border-color: var(--green); color: #1a3a2a; }
+  .vf-btn.c-wrong   { background: #fcedf2; border-color: var(--red);   color: #3a0a1a; }
+  .vf-btn:disabled  { cursor: default; }
+
+  /* FEEDBACK */
+  .feedback {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-family: 'Source Sans 3', sans-serif;
+    animation: fadeIn .25s ease;
+  }
+  .feedback.ok  { background: #edf7f1; border-left: 4px solid var(--green); }
+  .feedback.ko  { background: #fcedf2; border-left: 4px solid var(--red); }
+  .feedback-title { font-weight: 700; font-size: 15px; }
+  .feedback.ok .feedback-title { color: #1a4a2a; }
+  .feedback.ko .feedback-title { color: #5a1a2a; }
+  .feedback-answer { font-size: 13px; color: #5a1a2a; margin-top: 5px; }
+  .feedback-expl   { font-size: 13px; color: #3a2a1a; line-height: 1.55; margin-top: 6px; font-style: italic; }
+
+  /* ACTIONS */
+  .actions { display: flex; justify-content: flex-end; }
+  .btn-primary {
+    padding: 13px 30px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .2s, opacity .2s;
+    letter-spacing: .3px;
+  }
+  .btn-primary:hover { background: #b07a28; }
+  .btn-primary:disabled { opacity: .4; cursor: default; }
+  .btn-primary.green { background: var(--green); }
+  .btn-primary.green:hover { background: #2a5a3a; }
+
+  /* RESULTS */
+  .results-header {
+    text-align: center;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    box-shadow: 0 4px 28px rgba(80,40,0,.09);
+    margin-bottom: 24px;
+  }
+  .results-emoji { font-size: 44px; margin-bottom: 10px; }
+  .results-title { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 16px; }
+  .score-big { font-family: 'Playfair Display', serif; font-size: 58px; color: var(--accent); line-height: 1; }
+  .score-den { font-size: 28px; color: var(--muted); }
+  .score-bar-wrap { height: 8px; background: #ddd0bc; border-radius: 99px; overflow: hidden; margin: 16px 0 12px; }
+  .score-bar-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+  .score-msg { font-style: italic; font-size: 15px; color: #5a4020; }
+
+  .correction-list { display: flex; flex-direction: column; gap: 13px; margin-bottom: 28px; }
+  .correction-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px 18px;
+    box-shadow: 0 2px 8px rgba(80,40,0,.05);
+  }
+  .correction-card.ok { border-left: 4px solid var(--green); }
+  .correction-card.ko { border-left: 4px solid var(--red); }
+  .c-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .c-icon { font-size: 17px; }
+  .c-question { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); margin-bottom: 5px; line-height: 1.45; }
+  .c-num { color: var(--accent); margin-right: 4px; }
+  .c-your  { font-size: 13px; color: #7a3a5a; margin-bottom: 3px; }
+  .c-right { font-size: 14px; font-weight: 700; color: #1a4a2a; margin-bottom: 5px; }
+  .c-expl  { font-size: 13px; color: #5a4020; line-height: 1.5; font-style: italic; }
+
+  .btn-restart {
+    display: block; width: 100%;
+    padding: 15px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px; font-weight: 700;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 12px; cursor: pointer;
+    transition: background .2s;
+    letter-spacing: .3px;
+  }
+  .btn-restart:hover { background: #b07a28; }
+
+  @media (max-width: 480px) {
+    .choices { grid-template-columns: 1fr; }
+    .question-text { font-size: 17px; }
+    .score-big { font-size: 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+const QUESTIONS = [
+  { id:1,  type:"kanak_fr", q:"Que signifie le mot nêlêmwa « wi » ?", a:"eau", expl:"« wi » est le mot de base pour l'eau. C'est une racine qui entre dans de nombreux composés (wi hnu, wi yaak, wi wolo, wi naam)." },
+  { id:2,  type:"fr_kanak", q:"Comment dit-on « maison » en nêlêmwa ?", a:"mwa", expl:"« mwa » = maison. On le retrouve dans « mwa fooyet » (cuisine), littéralement la maison où l'on cuisine." },
+  { id:3,  type:"qcm",      q:"Que signifie « wi yaak » ?", choices:["eau douce","eau trouble","eau salée / mer","eau chaude"], a:"eau salée / mer", expl:"« wi yaak » désigne l'eau salée ou la mer. « yaak » porte la notion de sel." },
+  { id:4,  type:"vrai_faux",q:"« mwa fooyet » signifie « maison de la forêt ».", a:false, expl:"Faux. « mwa fooyet » = cuisine, littéralement « maison de la cuisson ». « fooyet » = cuisiner." },
+  { id:5,  type:"kanak_fr", q:"Que signifie « kuvic » ?", a:"igname", expl:"Le kuvic (igname) est un tubercule central dans la culture nêlêmwa. On parle aussi de « cela kuvic » pour la marmite d'igname." },
+  { id:6,  type:"qcm",      q:"Quel mot nêlêmwa désigne la banane ?", choices:["mido","nu","mugic","nok"], a:"mugic", expl:"« mugic » = banane. À ne pas confondre avec « mido » (taro) ou « nu » (coco)." },
+  { id:7,  type:"fr_kanak", q:"Comment dit-on « taro » en nêlêmwa ?", a:"mido", expl:"Le « mido » est le taro, une plante à tubercule très utilisée dans la cuisine nêlêmwa traditionnelle." },
+  { id:8,  type:"vrai_faux",q:"« naara » désigne une pierre à four.", a:true, expl:"Vrai ! Ces pierres sont chauffées pour cuire les aliments dans le four traditionnel enterré (ââdaxi naara)." },
+  { id:9,  type:"kanak_fr", q:"Que signifie « yââ-cet » ?", a:"feu de cuisine / feu de cuisson", expl:"« yââ-cet » est le feu destiné à la cuisine. On le retrouve dans : « Hla pwa yââ-cet » (ils coupent du bois pour la cuisine)." },
+  { id:10, type:"qcm",      q:"Que signifie « ââdaxi naara » ?", choices:["marmite de poisson","eau chaude","four traditionnel enterré","forêt dense"], a:"four traditionnel enterré", expl:"Technique de cuisson ancestrale utilisant des pierres (naara) chauffées, enterrées avec les aliments." },
+  { id:11, type:"fr_kanak", q:"Comment dit-on « poisson » en nêlêmwa ?", a:"nok", expl:"« nok » = poisson. On le retrouve dans « cela nok » (marmite de poisson)." },
+  { id:12, type:"vrai_faux",q:"« wi wolo » signifie « eau chaude ».", a:false, expl:"Faux. « wi wolo » = eau trouble. C'est « wi hnu » qui signifie eau chaude." },
+  { id:13, type:"kanak_fr", q:"Que signifie « nu beng » ?", a:"coco sec", expl:"« nu » = coco, « beng » qualifie le coco sec. Le coco sec s'utilise différemment du coco frais en cuisine." },
+  { id:14, type:"qcm",      q:"Que signifie « cela nok » ?", choices:["coco sec","marmite de poisson","eau douce","feu de cuisson"], a:"marmite de poisson", expl:"« cela » = marmite, « nok » = poisson. « cela nok » est la marmite de poisson." },
+  { id:15, type:"fr_kanak", q:"Comment dit-on « eau douce » en nêlêmwa ?", a:"wi naam", expl:"« wi naam » = eau douce, par opposition à « wi yaak » (eau salée). « naam » porte l'idée de douceur." },
+  { id:16, type:"vrai_faux",q:"« kak thân » signifie « forêt dense ».", a:true, expl:"Vrai ! « kak thân » désigne la forêt dense, espace naturel important dans l'environnement nêlêmwa." },
+  { id:17, type:"kanak_fr", q:"Que signifie « fooyet » ?", a:"cuisiner", expl:"« fooyet » = cuisiner. Il forme « mwa fooyet » (cuisine = la maison où l'on cuisine)." },
+  { id:18, type:"qcm",      q:"Que signifie « wi hnu » ?", choices:["eau froide","eau trouble","eau salée","eau chaude"], a:"eau chaude", expl:"« wi hnu » = eau chaude. « hnu » apporte la notion de chaleur au mot de base « wi » (eau)." },
+  { id:19, type:"fr_kanak", q:"Comment dit-on « coco » en nêlêmwa ?", a:"nu", expl:"« nu » = coco. On le retrouve dans « nu beng » (coco sec)." },
+  { id:20, type:"phrase",   q:"Traduis cette phrase en français : « Hla pwa yââ-cet. »", a:"Ils/Elles coupent du bois pour faire la cuisine.", expl:"« Hla » = ils/elles, « pwa » = couper, « yââ-cet » = feu de cuisine. La phrase évoque la préparation du bois de chauffe." },
+];
+
+const TYPE_LABEL = { kanak_fr:"Nêlêmwa → Français", fr_kanak:"Français → Nêlêmwa", qcm:"QCM", vrai_faux:"Vrai / Faux", phrase:"Traduction de phrase" };
+const TYPE_TAG   = { kanak_fr:"tag-kanak", fr_kanak:"tag-fr", qcm:"tag-qcm", vrai_faux:"tag-vf", phrase:"tag-phrase" };
+
+function shuffle(arr) { return [...arr].sort(()=>Math.random()-.5); }
+
+let questions = shuffle(QUESTIONS).map(q => q.type==="qcm" ? {...q, shuffledChoices: shuffle(q.choices)} : q);
+let current = 0;
+let answers = {};
+let submitted = false;
+
+function norm(s) { return String(s).trim().toLowerCase(); }
+function isCorrect(q) {
+  const ua = answers[q.id];
+  if (ua===undefined || ua==="") return false;
+  if (q.type==="vrai_faux") return ua===q.a;
+  return norm(ua)===norm(q.a);
+}
+
+function render() {
+  const app = document.getElementById("app");
+  const total = questions.length;
+
+  if (current >= total) { renderResults(app); return; }
+
+  const q = questions[current];
+  const ua = answers[q.id];
+  const pct = ((current+1)/total*100).toFixed(1);
+
+  let inputHTML = "";
+  if (q.type==="kanak_fr"||q.type==="fr_kanak"||q.type==="phrase") {
+    const cls = submitted ? (isCorrect(q)?"correct":"wrong") : "";
+    inputHTML = `<textarea id="ans" rows="${q.type==='phrase'?3:2}" class="${cls}" ${submitted?"disabled":""} placeholder="Votre réponse...">${ua||""}</textarea>`;
+  } else if (q.type==="qcm") {
+    const choices = q.shuffledChoices;
+    inputHTML = `<div class="choices">${choices.map(c=>{
+      let cls="choice-btn";
+      if(submitted){ if(c===q.a) cls+=" c-correct"; else if(ua===c) cls+=" c-wrong"; }
+      else if(ua===c) cls+=" selected";
+      return `<button class="${cls}" onclick="selectChoice('${c.replace(/'/g,"\\'")}',this)" ${submitted?"disabled":""}>${c}</button>`;
+    }).join("")}</div>`;
+  } else if (q.type==="vrai_faux") {
+    const btnV = "vf-btn"+(submitted?(q.a===true?" c-correct":ua===true?" c-wrong":""):(ua===true?" selected":""));
+    const btnF = "vf-btn"+(submitted?(q.a===false?" c-correct":ua===false?" c-wrong":""):(ua===false?" selected":""));
+    inputHTML = `<div class="vf-row">
+      <button class="${btnV}" onclick="selectVF(true)" ${submitted?"disabled":""}>✔ Vrai</button>
+      <button class="${btnF}" onclick="selectVF(false)" ${submitted?"disabled":""}>✘ Faux</button>
+    </div>`;
+  }
+
+  let feedbackHTML = "";
+  if (submitted) {
+    const ok = isCorrect(q);
+    const answerLine = q.type==="vrai_faux" ? (q.a?"Vrai":"Faux") : q.a;
+    feedbackHTML = `<div class="feedback ${ok?"ok":"ko"}">
+      <div class="feedback-title">${ok?"✓ Correct !":"✗ Incorrect"}</div>
+      ${!ok?`<div class="feedback-answer">Réponse attendue : ${answerLine}</div>`:""}
+      <div class="feedback-expl">${q.expl}</div>
+    </div>`;
+  }
+
+  const canSubmit = (ua!==undefined && ua!=="");
+  const btnHTML = !submitted
+    ? `<button class="btn-primary" onclick="doSubmit()" ${canSubmit?"":"disabled"}>Valider</button>`
+    : `<button class="btn-primary green" onclick="doNext()">${current<total-1?"Question suivante →":"Voir le corrigé"}</button>`;
+
+  app.innerHTML = `
+    <div class="site-header">
+      <div class="brand">
+        <span class="brand-title">🌿 Nêlêmwa</span>
+        <span class="brand-sub">Cuisine traditionnelle</span>
+      </div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-label">${current+1} / ${total}</span>
+      </div>
+    </div>
+    <div class="card">
+      <div><span class="type-tag ${TYPE_TAG[q.type]}">${TYPE_LABEL[q.type]}</span></div>
+      <p class="question-text">${q.q}</p>
+      ${inputHTML}
+      ${feedbackHTML}
+    </div>
+    <div class="actions">${btnHTML}</div>`;
+
+  if (q.type!=="qcm"&&q.type!=="vrai_faux") {
+    const ta = document.getElementById("ans");
+    if(ta&&!submitted){ ta.addEventListener("input",e=>{ answers[q.id]=e.target.value; refreshBtn(); }); }
+  }
+}
+
+function refreshBtn() {
+  const q=questions[current]; const ua=answers[q.id];
+  const btn=document.querySelector(".btn-primary");
+  if(btn) btn.disabled=(!ua||ua==="");
+}
+
+function selectChoice(c) {
+  if(submitted) return;
+  answers[questions[current].id]=c;
+  render();
+}
+function selectVF(val) {
+  if(submitted) return;
+  answers[questions[current].id]=val;
+  render();
+}
+function doSubmit() {
+  const q=questions[current]; const ua=answers[q.id];
+  if(ua===undefined||ua==="") return;
+  submitted=true; render();
+}
+function doNext() {
+  current++; submitted=false; render();
+}
+
+function renderResults(app) {
+  const total = questions.length;
+  const score = questions.reduce((s,q)=>s+(isCorrect(q)?1:0),0);
+  const pct = Math.round(score/total*100);
+  const barColor = pct>=70?"#3d7a5a":pct>=50?"#c8913a":"#9a3a5a";
+  const msg = pct>=80?"Excellent ! Tu maîtrises déjà bien le vocabulaire nêlêmwa 🌿":pct>=60?"Bon travail ! Continue à pratiquer 🥥":"Continue tes efforts, chaque mot compte ! 🌊";
+
+  const corrections = questions.map((q,i)=>{
+    const ok=isCorrect(q);
+    const ua=answers[q.id];
+    const answerLine = q.type==="vrai_faux"?(q.a?"Vrai":"Faux"):q.a;
+    const uaLine = ua===undefined||ua===""?"(sans réponse)":q.type==="vrai_faux"?(ua?"Vrai":"Faux"):ua;
+    return `<div class="correction-card ${ok?"ok":"ko"}">
+      <div class="c-top">
+        <span class="type-tag ${TYPE_TAG[q.type]}">${TYPE_LABEL[q.type]}</span>
+        <span class="c-icon">${ok?"✓":"✗"}</span>
+      </div>
+      <p class="c-question"><span class="c-num">Q${i+1}.</span>${q.q}</p>
+      ${!ok?`<p class="c-your">Votre réponse : <em>${uaLine}</em></p>`:""}
+      <p class="c-right">✔ ${answerLine}</p>
+      <p class="c-expl">${q.expl}</p>
+    </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="results-header">
+      <div class="results-emoji">🔥</div>
+      <h1 class="results-title">Corrigé complet</h1>
+      <div class="score-big">${score}<span class="score-den">/${total}</span></div>
+      <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <p class="score-msg">${msg}</p>
+    </div>
+    <div class="correction-list">${corrections}</div>
+    <button class="btn-restart" onclick="restart()">Recommencer le quiz</button>`;
+}
+
+function restart() {
+  questions=shuffle(QUESTIONS).map(q=>q.type==="qcm"?{...q,shuffledChoices:shuffle(q.choices)}:q);
+  current=0; answers={}; submitted=false; render();
+}
+
+render();
+</script>
+</body>
+</html>
